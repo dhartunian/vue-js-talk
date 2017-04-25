@@ -7,7 +7,7 @@
 		<title>reveal.js</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/solarized.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,8 +24,307 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				  <section><h2>Improving interactivity for legacy front-end applications using Vue.js</h2></section>
+				<section>
+            <section><h2>Introduction</h2></section>
+            <section>
+                <h3>Who am I?</h3>
+                <ul>
+                    <li>Full stack programmer</li>
+                    <li>Got started in backend, more recently a javascript enthusiast</li>
+                    <li>Work at Position Development!</li>
+                </ul>
+            </section>
+            <section>
+                Thanks to Libby for motivating me and to GothamSass for having me!
+            </section>
+        </section>
+				<section>
+            <section><h2>Motivation</h2></section>
+            <section>
+                <h3>Magazine Subscription Page</h3>
+                <p>Examples of interactions required:</p>
+                <ul>
+                    <li>
+                        Show different price based on "print" or "digital"
+                    </li>
+                    <li>
+                        Show higher price if subscription is shipped internationally
+                    </li>
+                    <li>
+                        Hide address fields if subscription is "digital" only
+                    </li>
+                    <li>
+                        Show discounted cost if URL contains discount code
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>I need to add:</h3>
+                <ul>
+                    <li>
+                        Ability to select a subscription term (1, 2, 3 yr)
+                    </li>
+                    <li>
+                        When a user chooses the "International" shipping option, they see a dropdown
+                        to choose their country in the address section
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h4>...to code that looks like:</h4>
+                <pre>
+        pad = "0";
+      }
+      return Math.floor(d / 100) + "." + pad + (d % 100);
+    }
+
+    if ($(".coupon-info").length != 0) {
+      if (c.attr("data-ship") === "1") {
+        <mark>var d = $(".coupon-info").attr("data-" + c.attr("data-type") + "-" + sc.attr("data-code"));</mark>
+      } else {
+        var d = $(".coupon-info").attr("data-" + c.attr("data-type"));
+      }
+
+      if ($(".coupon-info").attr("data-gift-only") === "true") {
+        if (is_gift()) {
+          var gift_passed = true;
+        } else {
+          var gift_passed = false;
+                </pre>
+            </section>
+        </section>
+				<section>
+            <section><h2>What do I do?</h2></section>
+            <section>
+                <h3>The existing jQuery is hard to understand/modify</h3>
+                <aside class="notes">
+                    Disclaimer: I've never built a site using jQuery so I have a stronger fear of
+                    it than a lot of other people
+                </aside>
+            </section>
+            <section>
+                <h3>I'm worried about the next set of requirements we'll need to accomodate</h3>
+                <aside class="notes">
+                    Even though we're building a "traditional web site" the interaction
+                    requirements that clients expect to easily handle are increasing every day.
+                    We need to meet those expectations.
+                </aside>
+            </section>
+            <section>
+                <h3>I don't have a lot of extra time to spend on this simple request</h3>
+                <aside class="notes">
+                    Of course I wish we had an SPA architecture with a JSON API but we don't
+                    I can't change everything about the site all at once
+                </aside>
+            </section>
+            <section>
+                <h3>I love React but I can't use it here</h3>
+                <ul>
+                    <li>Don't have bundling or babel set up for javascript</li>
+                    <li>The divs are already rendered by the server</li>
+                    <li>I don't have a JSON API...</li>
+                </ul>
+            </section>
+        </section>
+				<section>
+            <section><h1>Vue!</h1></section>
+            <section>
+                <h2>First Steps</h2>
+
+                <ul>
+                    <li>Chose to check out Vue based on <a href="http://stateofjs.com/2016/frontend/">State of JS Survey</a></li>
+                    <li>
+                        Spent an afternoon prototyping and got surprisingly far!
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Code Examples!</h2>
+            </section>
+            <section>
+                <h3>Hello World</h3>
+                <pre>
+                    <code data-trim>
+                        <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+                        <div id="my-component">
+                            {{ display_text }}
+                        </div>
+                    </code>
+                </pre>
+                <pre>
+                    <code data-noescape>new Vue({
+  el: '#my-component',
+  data: {
+    display_text: 'Hello World!'
+  }
+}) </code>
+                </pre>
+            </section>
+            <section>
+                <h3>A Simple Toggle</h3>
+                <pre>
+                    <code data-trim>
+                        <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+                        <div id="my-component">
+                            <div v-if="show_display">
+                                {{ display_text }}
+                            </div>
+                            <input type="checkbox"
+                                   v-model="show_display" />
+                            <label>Show hello</label>
+                        </div>
+                    </code>
+                </pre>
+                <pre>
+                    <code data-noescape>new Vue({
+  el: '#my-component',
+  data: {
+    display_text: 'Hello World!',
+    show_display: true
+  }
+}) </code>
+                </pre>
+            </section>
+            <section>
+                <h3>Displaying Computed Data</h3>
+                <pre style="font-size: 0.3em">
+                    <code data-trim>
+                        <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+                        <div id="my-component">
+                            <input type="checkbox" v-model="expedite_shipping" />
+                            <label>Expedite Shipping</label>
+                            <input type="checkbox" v-model="add_donation" />
+                            <label>Add Donation</label>
+                            <div>Subtotal: {{ subtotal }}</div>
+                        </div>
+                    </code>
+                </pre>
+                <pre style="font-size: 0.3em">
+                    <code data-noescape>new Vue({
+  el: '#my-component',
+	data: {
+  	expedite_shipping: false,
+    add_donation: false
+  },
+  computed: {
+    shipping_subtotal: function() {
+    	if (this.expedite_shipping) {
+      	return 5
+      } else {
+        return 1
+      }
+    },
+    donation_subtotal: function() {
+    	if (this.add_donation) {
+      	return 10
+      } else {
+        return 0
+      }
+    },
+  	subtotal: function() {
+			return 10 + this.shipping_subtotal + this.donation_subtotal
+    }
+  }
+})</code>
+                </pre>
+            </section>
+            <section>
+                <h3>Communicating with the Backend</h3>
+                <pre style="font-size: 0.3em">
+                    <code data-trim>
+
+                        <div id="my-component">
+                            <input type="checkbox" data-reg="5" data-exp="10"
+                                   ref="shipping_toggle"
+                                   v-model="expedite_shipping" />
+                            <label>Expedite Shipping</label>
+                            <input type="checkbox" data-amount="15"
+                                   ref="donation_toggle"
+                                   v-model="add_donation" />
+                            <input type="hidden" data-amount="99"
+                                   ref="base_cost"/>
+                            <label>Add Donation</label>
+                            <div>Subtotal: {{ subtotal }}</div>
+                        </div>
+                    </code>
+                </pre>
+                <pre style="font-size: 0.3em">
+                    <code data-noescape>new Vue({
+  el: '#my-component',
+  data: {
+    expedite_shipping: false, add_donation: false,
+    shipping_cost: {reg: 0, exp: 0}, donation_cost: 0, base_cost: 0
+  },
+  mounted: function() {
+    this.shipping_cost = {
+      reg: parseInt(this.$refs.shipping_toggle.dataset.reg),
+      exp: parseInt(this.$refs.shipping_toggle.dataset.exp)
+    };
+    this.donation_cost = parseInt(this.$refs.donation_toggle.dataset.amount);
+    this.base_cost = parseInt(this.$refs.base_cost.dataset.amount);
+  },
+  computed: {
+    shipping_subtotal: function() {
+      return this.expedite_shipping ? this.shipping_cost.exp : this.shipping_cost.reg
+    },
+    donation_subtotal: function() {
+      return this.add_donation ? this.donation_cost : 0
+    },
+    subtotal: function() {
+      return this.base_cost + this.shipping_subtotal + this.donation_subtotal;
+    }
+  }
+})
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h3>CodePens!</h3>
+                <ul>
+                    <li><a href="https://codepen.io/dhartunian/pen/YVGdqv">Hello World</a></li>
+                    <li><a href="https://codepen.io/dhartunian/pen/MmjZey">A Simple Toggle</a></li>
+                    <li><a href="https://codepen.io/dhartunian/pen/dWpwXe">A Simple Toggle 2</a></li>
+                    <li><a href="https://codepen.io/dhartunian/pen/OmRrXG">Displaying Computed Data</a></li>
+                    <li><a href="https://codepen.io/dhartunian/pen/rmMoMj">Communicating with the Backend</a></li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <h1>"The Pattern"</h1>
+
+            <ol>
+                <li>Somewhere (in 1 place!), we have the data</li>
+                <li>User input can change the data</li>
+                <li>Rendering of DOM is automatic and derived from the data</li>
+            </ol>
+            <aside class="notes">
+                Once you decouple things and you're not directly changing the
+                DOM based on other parts of the DOM, you gain clarity and
+                confidence that things work as you intended.
+
+                Now you can make fancier web sites!
+
+                This is easier to teach your designers to work with. Can set up
+                a simpler division of labor between someone adding visuals based
+                on data and another person adding the computation of that data
+                or interactions separately.
+            </aside>
+        </section>
+        <section>
+            <h2>What's Next?</h2>
+            <ul>
+                <li>Vue all the (legacy|jQuery) things</li>
+                <li>Empower designers we work with to create more interactive designs!</li>
+                <li>Try out SPA structure for new projects with Vue (!!)</li>
+            </ul>
+        </section>
+				<section>
+            Questions?
+        </section>
 			</div>
 		</div>
 
