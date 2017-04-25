@@ -32,11 +32,17 @@
                 <ul>
                     <li>Full stack programmer</li>
                     <li>Got started in backend, more recently a javascript enthusiast</li>
-                    <li>Work at Position Development!</li>
+                    <li>Work at <a href="http://www.positiondev.com" >Position Development!</a></li>
                 </ul>
             </section>
+            <section data-background-iframe="http://www.positiondev.com" data-background-color="#ffffff">
+            </section>
             <section>
-                Thanks to Libby for motivating me and to GothamSass for having me!
+                <h3>Thanks!</h3>
+                <ul>
+                    <li>My co-worker Libby motivated me to do this talk!</li>
+                    <li>Thanks to GothamSass for having me!</li>
+                </ul>
             </section>
         </section>
 				<section>
@@ -60,6 +66,9 @@
                 </ul>
             </section>
             <section>
+                <img class="stretch" src="subscription_select.gif" />
+            </section>
+            <section>
                 <h3>I need to add:</h3>
                 <ul>
                     <li>
@@ -73,7 +82,30 @@
             </section>
             <section>
                 <h4>...to code that looks like:</h4>
-                <pre>
+                <pre style="font-size:0.2em">
+  function amount_calc() {
+    var c = $(".type-choice input:checked");
+    var shipping = 0;
+    var digital_desc = "";
+    if (c.attr("data-ship") === "1") {
+      $(".shipping-choice").removeClass("inactive");
+      $(".shipping-choice input").removeAttr("disabled");
+      if (!is_gift()) {
+        $(".shipping-information").show();
+      }
+      var sc = $(".shipping-choice input:checked");
+      shipping = Number(sc.attr("data-amount"));
+      digital_desc = " (" + sc.parent().find(".desc").text() + ")";
+    } else {
+      $(".shipping-choice").addClass("inactive");
+      $(".shipping-choice input").attr("disabled", "disabled");
+      $(".shipping-information").hide();
+    }
+    var discount = 0;
+
+    function format_money(d) {
+      var pad = "";
+      if (d % 100 < 10) {
         pad = "0";
       }
       return Math.floor(d / 100) + "." + pad + (d % 100);
@@ -81,7 +113,7 @@
 
     if ($(".coupon-info").length != 0) {
       if (c.attr("data-ship") === "1") {
-        <mark>var d = $(".coupon-info").attr("data-" + c.attr("data-type") + "-" + sc.attr("data-code"));</mark>
+<mark>        var d = $(".coupon-info").attr("data-" + c.attr("data-type") + "-" + sc.attr("data-code"));</mark>
       } else {
         var d = $(".coupon-info").attr("data-" + c.attr("data-type"));
       }
@@ -91,6 +123,22 @@
           var gift_passed = true;
         } else {
           var gift_passed = false;
+        }
+      } else {
+        var gift_passed = true;
+      }
+
+      if (typeof d !== "undefined" && d !== "0" && gift_passed) {
+        discount = Number(d)
+        $(".coupon-amount").text(" - $" + format_money(d) + " Off");
+      } else {
+        $(".coupon-amount").text(" - You can't use this coupon with that selection.");
+      }
+    }
+
+    var cents = Number(c.attr("data-amount")) + shipping - discount;
+    var amount = format_money(cents);
+    $(".total .amount").text(amount);
                 </pre>
             </section>
         </section>
@@ -138,6 +186,12 @@
                         Spent an afternoon prototyping and got surprisingly far!
                     </li>
                 </ul>
+            </section>
+            <section>
+                <img class="stretch" src="front-end-frameworks.png"/>
+                <div style="font-size:0.4em">source: <a href="http://stateofjs.com/2016/frontend/">http://stateofjs.com/2016/frontend/</a></div>
+            </section>
+            <section data-background-iframe="https://vuejs.org/v2/guide/" data-background-color="#ffffff">
             </section>
             <section>
                 <h2>Code Examples!</h2>
@@ -206,27 +260,27 @@
                 <pre style="font-size: 0.3em">
                     <code data-noescape>new Vue({
   el: '#my-component',
-	data: {
-  	expedite_shipping: false,
+  data: {
+    expedite_shipping: false,
     add_donation: false
   },
   computed: {
     shipping_subtotal: function() {
-    	if (this.expedite_shipping) {
-      	return 5
+      if (this.expedite_shipping) {
+        return 5
       } else {
         return 1
       }
     },
     donation_subtotal: function() {
-    	if (this.add_donation) {
-      	return 10
+      if (this.add_donation) {
+        return 10
       } else {
         return 0
       }
     },
-  	subtotal: function() {
-			return 10 + this.shipping_subtotal + this.donation_subtotal
+    subtotal: function() {
+      return 10 + this.shipping_subtotal + this.donation_subtotal
     }
   }
 })</code>
@@ -322,16 +376,16 @@
                 <li>Try out SPA structure for new projects with Vue (!!)</li>
             </ul>
         </section>
-				<section>
+        <section>
             Questions?
         </section>
-			</div>
-		</div>
+      </div>
+    </div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
 
-		<script>
+    <script>
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				history: true,
