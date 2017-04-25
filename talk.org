@@ -1,0 +1,131 @@
+* Introduction
+** Who I am
+*** A Programmer
+*** Got my start in backend, more recently a javascript enthusiast
+** Where I work
+*** Position Development!
+** Thanks to...
+*** GothamSass
+*** Libby
+* Motivation
+** Problem Statement
+   Let's dive right into the motivation for Vue and this talk:
+
+   I have a simple page that lets a customer subscribe to a magazine. They have a
+ bunch of options to choose from that affect what they see on the page:
+
+   - print or digital subscriptions
+   - shipping location
+   - if the sub is digital, they don't need to input an address or choose shipping
+   - if they have a gift code the discount should be shown
+
+   All of this exists and works
+
+   I needed to add:
+   - Ability to choose a subscription term (1, 2, 3 yr)
+   - When a user chooses the "International" shipping option, they get a dropdown
+     to choose their country in the address section
+
+   etc. etc.
+** Sample code
+  function amount_calc() {
+    var c = $(".type-choice input:checked");
+    var shipping = 0;
+    var digital_desc = "";
+    if (c.attr("data-ship") === "1") {
+      $(".shipping-choice").removeClass("inactive");
+      $(".shipping-choice input").removeAttr("disabled");
+      if (!is_gift()) {
+        $(".shipping-information").show();
+      }
+      var sc = $(".shipping-choice input:checked");
+      shipping = Number(sc.attr("data-amount"));
+      digital_desc = " (" + sc.parent().find(".desc").text() + ")";
+    } else {
+      $(".shipping-choice").addClass("inactive");
+      $(".shipping-choice input").attr("disabled", "disabled");
+      $(".shipping-information").hide();
+    }
+    var discount = 0;
+
+    function format_money(d) {
+      var pad = "";
+      if (d % 100 < 10) {
+        pad = "0";
+      }
+      return Math.floor(d / 100) + "." + pad + (d % 100);
+    }
+
+    if ($(".coupon-info").length != 0) {
+      if (c.attr("data-ship") === "1") {
+        var d = $(".coupon-info").attr("data-" + c.attr("data-type") + "-" + sc.attr("data-code"));
+      } else {
+        var d = $(".coupon-info").attr("data-" + c.attr("data-type"));
+      }
+
+      if ($(".coupon-info").attr("data-gift-only") === "true") {
+        if (is_gift()) {
+          var gift_passed = true;
+        } else {
+          var gift_passed = false;
+        }
+      } else {
+        var gift_passed = true;
+      }
+
+      if (typeof d !== "undefined" && d !== "0" && gift_passed) {
+        discount = Number(d)
+        $(".coupon-amount").text(" - $" + format_money(d) + " Off");
+      } else {
+        $(".coupon-amount").text(" - You can't use this coupon with that selection.");
+      }
+    }
+
+    var cents = Number(c.attr("data-amount")) + shipping - discount;
+    var amount = format_money(cents);
+    $(".total .amount").text(amount);
+* What do I do?
+** The existing jQuery is hard to understand/modify
+   Disclaimer: I've never built a site using jQuery so I have a stronger fear of
+   it than a lot of other people
+** I'm worried about the next set of requirements we'll need to accomodate
+   Even though we're building a "traditional web site" the interaction
+   requirements that clients expect to easily handle are increasing every day.
+   We need to meet those expectations.
+** I don't have a lot of extra time to spend on this simple request
+   Of course I wish we had an SPA architecture with a JSON API but we don't
+   I can't change everything about the site all at once
+** I love React but I can't use it here
+*** Don't want to get into the whole npm/webpack tangle
+*** My divs are *already rendered* by the server
+*** I don't have a JSON API...or *any* API for that matter and don't have time to write one
+* Vue!
+** First steps
+   I decided to prototype a replacement to the jQuery code using Vue. I chose it
+   because I had seen on the http://stateofjs.com/2016/frontend/ survey and it
+   sounded like something people liked.
+
+   I spent an afternoon prototyping a solution and ended up finishing it up in a
+   few more days and keeping it!
+
+   Here are my discoveries...
+** Code Examples!
+*** Hello World
+*** A Simple Toggle
+*** Displaying Computed Data
+*** Communicating with the Backend
+** "The Pattern"
+   1. Somewhere (in 1 place!), we have _the data_
+   2. User input can change that _the data_
+   3. Rendering of DOM is based on _the data_
+
+   Once you decouple things and you're not directly changing the DOM based on
+   other parts of the DOM, you gain clarity and confidence that things work as
+   you intended.
+
+   Now you can make fancier web sites!
+** What's next?
+   - Vue all the (legacy|jQuery) things
+   - Empower designers we work with to create more interactive designs!
+   - SPA structure for new projects with Vue (!!)
+* Questions?
